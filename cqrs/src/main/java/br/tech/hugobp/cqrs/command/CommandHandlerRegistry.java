@@ -19,7 +19,7 @@ public class CommandHandlerRegistry {
     }
 
     public CommandHandler<? extends Command> getHandler(Command cmd) {
-        return Optional.ofNullable(commandHandlersByCommandId.get(cmd.getCommandId()))
+        return Optional.ofNullable(commandHandlersByCommandId.get(cmd.getName()))
             .orElseThrow(() -> new UnknownCommandException(cmd));
     }
 }

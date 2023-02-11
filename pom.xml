@@ -11,6 +11,7 @@
     <modules>
         <module>cqrs</module>
         <module>secret-santa</module>
+        <module>cqrs-postgres</module>
     </modules>
 
     <properties>

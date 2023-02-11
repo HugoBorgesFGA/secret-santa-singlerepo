@@ -1,5 +1,6 @@
 package br.tech.hugobp.cqrs.command;
 
+import br.tech.hugobp.cqrs.command.exceptions.BusinessException;
 import br.tech.hugobp.cqrs.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 
@@ -12,11 +13,11 @@ public class CommandExecutor {
     private final EventPublisher eventPublisher;
 
     public String execute(Command command) {
-        RuntimeException error = null;
+        BusinessException error = null;
         try {
             final CommandHandler<? extends Command> handler = handlerRegistry.getHandler(command);
             handler.handle(command, eventPublisher);
-        } catch (RuntimeException runtimeException) {
+        } catch (BusinessException runtimeException) {
             error = runtimeException;
         } finally {
             if (Objects.nonNull(error)) {

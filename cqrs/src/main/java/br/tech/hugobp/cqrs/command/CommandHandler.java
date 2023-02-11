@@ -8,7 +8,7 @@ public abstract class CommandHandler<Cmd extends Command> {
     private final String targetCommandId;
 
     public CommandHandler(Class<Cmd> cmdClass) {
-        this.targetCommandId = Command.createCommandId(cmdClass);
+        this.targetCommandId = Command.createCommandName(cmdClass);
     }
 
     public String getTargetCommandId() {
