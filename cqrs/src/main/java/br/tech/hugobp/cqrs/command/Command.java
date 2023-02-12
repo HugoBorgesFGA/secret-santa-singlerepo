@@ -16,7 +16,7 @@ public abstract class Command<Data extends Serializable> {
     private final Data data;
 
     public Command(int version, Data data, String entityId) {
-        this.createdAt = System.nanoTime();
+        this.createdAt = System.currentTimeMillis();
         this.name = Command.createCommandName(getClass());
         this.version = version;
         this.id = UUID.randomUUID().toString();

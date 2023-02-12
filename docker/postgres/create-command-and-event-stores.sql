@@ -1,21 +1,20 @@
-CREATE DATABASE "write";
-\connect "write";
-CREATE SCHEMA commands;
-CREATE TABLE commands.store (
+CREATE DATABASE "secret-santa";
+
+\connect "secret-santa";
+CREATE SCHEMA cqrs;
+
+CREATE TABLE cqrs.commands (
 	id varchar(36) NOT NULL,
-	created_at timestamp NOT NULL,
+    created_at timestamp NOT NULL,
+    hash varchar(64) NOT NULL,
+	name varchar(128) NOT NULL,
 	id_entity varchar(36) NOT NULL,
-	id_command varchar(256) NOT NULL,
 	"data" jsonb NULL,
-	error varchar(128) NOT NULL
+	error varchar(512),
+	CONSTRAINT hash_unique UNIQUE (hash)
 );
 
-\disconnect;
-
-CREATE DATABASE "read";
-\connect "read"
-CREATE SCHEMA events;
-CREATE TABLE events.store (
+CREATE TABLE cqrs.events (
 	id varchar(36) NOT NULL,
 	created_at timestamp NOT NULL,
 	id_entity varchar(36) NOT NULL,

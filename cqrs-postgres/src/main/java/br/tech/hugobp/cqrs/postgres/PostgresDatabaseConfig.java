@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class PostgresDatabaseConfig {
     private String host;
     private Short port;
-    private String database;
+    private String name;
     private String username;
     private String password;
 }
