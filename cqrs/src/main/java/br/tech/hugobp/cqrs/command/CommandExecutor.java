@@ -12,7 +12,7 @@ public class CommandExecutor {
     private final CommandStore commandStore;
     private final EventPublisher eventPublisher;
 
-    public String execute(Command command) {
+    public void execute(Command command) {
         BusinessException error = null;
         try {
             final CommandHandler<? extends Command> handler = handlerRegistry.getHandler(command);
@@ -27,6 +27,5 @@ public class CommandExecutor {
         }
 
         commandStore.storeSuccessfulCommand(command);
-        return command.getId();
     }
 }
