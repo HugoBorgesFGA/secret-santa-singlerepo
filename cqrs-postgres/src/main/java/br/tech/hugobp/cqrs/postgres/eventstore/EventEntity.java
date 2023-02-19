@@ -1,4 +1,4 @@
-package br.tech.hugobp.cqrs.postgres.commandstore;
+package br.tech.hugobp.cqrs.postgres.eventstore;
 
 import br.tech.hugobp.cqrs.postgres.utils.NonRepeatableEntity;
 import lombok.Builder;
@@ -8,12 +8,11 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-class CommandEntity extends NonRepeatableEntity {
+public class EventEntity extends NonRepeatableEntity {
     private LocalDateTime createdAt;
     private String name;
     private int version;
-    private String commandId;
+    private String eventId;
     private String entityId;
     private String data;
-    private String error;
 }

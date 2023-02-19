@@ -1,6 +1,5 @@
 package br.tech.hugobp.cqrs.command;
 
-
 import br.tech.hugobp.cqrs.event.EventPublisher;
 
 public abstract class CommandHandler<Cmd extends Command> {
@@ -8,7 +7,7 @@ public abstract class CommandHandler<Cmd extends Command> {
     private final String targetCommandId;
 
     public CommandHandler(Class<Cmd> cmdClass) {
-        this.targetCommandId = Command.createCommandName(cmdClass);
+        this.targetCommandId = Command.createMessageName(cmdClass);
     }
 
     public String getTargetCommandId() {

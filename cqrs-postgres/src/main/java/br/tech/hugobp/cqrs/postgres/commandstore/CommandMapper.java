@@ -5,12 +5,14 @@ import br.tech.hugobp.cqrs.command.exceptions.CommandProcessingException;
 import br.tech.hugobp.cqrs.postgres.utils.NonRepeatableIdGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 
-class CommandMapper {
+@RequiredArgsConstructor
+public class CommandMapper {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    static CommandEntity toEntity(Command command, String errorMessage) {
+    public CommandEntity toEntity(Command command, String errorMessage) {
         final CommandEntity commandEntity;
         try {
             commandEntity = CommandEntity.builder()
@@ -18,7 +20,6 @@ class CommandMapper {
                 .name(command.getName())
                 .commandId(command.getId())
                 .entityId(command.getEntityId())
-                .version(command.getVersion())
                 .data(objectMapper.writeValueAsString(command.getData()))
                 .error(errorMessage)
                 .build();

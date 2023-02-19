@@ -1,4 +1,4 @@
-package br.tech.hugobp.cqrs.postgres.commandstore;
+package br.tech.hugobp.cqrs.postgres.eventstore;
 
 import br.tech.hugobp.cqrs.postgres.PostgresDatabaseConfig;
 
@@ -8,35 +8,33 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 
-public class CommandRepository {
-
+public class EventRepository {
     private static final Function<String, String> INSERT_COMMAND_INTO = (table) -> "INSERT INTO " + table + " " +
-            "(id, name, created_at, hash, id_entity, data, error) " +
-            "VALUES(?, ?, ?, ?, ?, ?::jsonb, ?)";
+            "(id, name, created_at, hash, id_entity, data) " +
+            "VALUES(?, ?, ?, ?, ?, ?::jsonb)";
     private static final Short DEFAULT_POSTGRES_PORT = 5432;
 
     private final String schema;
-    private final String commandTable;
+    private final String eventTable;
     private final Connection connection;
 
-    public CommandRepository(String schema, String commandTable, PostgresDatabaseConfig config) {
+    public EventRepository(String schema, String commandTable, PostgresDatabaseConfig config) {
         this.schema = schema;
-        this.commandTable = commandTable;
+        this.eventTable = commandTable;
         this.connection = buildConnection(config);
     }
 
-    public void save(CommandEntity commandEntity) {
+    public void save(EventEntity eventEntity) {
         try {
-            final String insertQuery = INSERT_COMMAND_INTO.apply(commandTable);
+            final String insertQuery = INSERT_COMMAND_INTO.apply(eventTable);
             final PreparedStatement statement = connection.prepareStatement(insertQuery);
 
-            statement.setString(1, commandEntity.getCommandId());
-            statement.setString(2, commandEntity.getName());
-            statement.setTimestamp(3, Timestamp.from(commandEntity.getCreatedAt().toInstant(ZoneOffset.UTC)));
-            statement.setString(4, commandEntity.getNonRepeatableId());
-            statement.setString(5, commandEntity.getEntityId());
-            statement.setString(6, commandEntity.getData());
-            statement.setString(7, commandEntity.getError());
+            statement.setString(1, eventEntity.getEventId());
+            statement.setString(2, eventEntity.getName());
+            statement.setTimestamp(3, Timestamp.from(eventEntity.getCreatedAt().toInstant(ZoneOffset.UTC)));
+            statement.setString(4, eventEntity.getNonRepeatableId());
+            statement.setString(5, eventEntity.getEntityId());
+            statement.setString(6, eventEntity.getData());
 
             statement.execute();
         } catch (SQLException e) {
@@ -47,16 +45,16 @@ public class CommandRepository {
     private Connection buildConnection(PostgresDatabaseConfig databaseConfig) {
         try {
             final short port = Optional.ofNullable(databaseConfig.getPort())
-                .orElse(DEFAULT_POSTGRES_PORT);
+                    .orElse(DEFAULT_POSTGRES_PORT);
 
             final String schema = Optional.ofNullable(this.schema)
-                .orElse("public");
+                    .orElse("public");
 
             final String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?currentSchema=%s",
-                databaseConfig.getHost(),
-                port,
-                databaseConfig.getName(),
-                schema
+                    databaseConfig.getHost(),
+                    port,
+                    databaseConfig.getName(),
+                    schema
             );
 
             final Properties props = new Properties();

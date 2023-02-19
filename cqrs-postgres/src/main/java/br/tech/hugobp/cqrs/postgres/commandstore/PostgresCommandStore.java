@@ -9,16 +9,17 @@ import lombok.RequiredArgsConstructor;
 public class PostgresCommandStore implements CommandStore {
 
     private final CommandRepository commandRepository;
+    private final CommandMapper commandMapper;
 
     @Override
     public void storeSuccessfulCommand(Command executedCommand) {
-        final CommandEntity commandEntity = CommandMapper.toEntity(executedCommand, null);
+        final CommandEntity commandEntity = commandMapper.toEntity(executedCommand, null);
         commandRepository.save(commandEntity);
     }
 
     @Override
     public void storeFailedCommand(Command executedCommand, BusinessException error) {
-        final CommandEntity commandEntity = CommandMapper.toEntity(executedCommand, error.getMessage());
+        final CommandEntity commandEntity = commandMapper.toEntity(executedCommand, error.getMessage());
         commandRepository.save(commandEntity);
     }
 }

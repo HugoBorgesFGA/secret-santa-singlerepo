@@ -1,36 +1,20 @@
 package br.tech.hugobp.cqrs.event;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import br.tech.hugobp.cqrs.Message;
+import br.tech.hugobp.cqrs.command.Command;
 
-public abstract class Event {
-    protected final String id;
-    protected final String entityId;
-    protected final LocalDateTime createdAt;
+import java.io.Serializable;
 
-    protected Event(String entityId) {
-        this.id = UUID.randomUUID().toString();
-        this.entityId = entityId;
-        this.createdAt = LocalDateTime.now();
+public abstract class Event extends Message {
+    protected Event(Serializable data, String entityId) {
+        super(data, entityId);
     }
 
-    public String getEventType() {
-        return Event.createEventType(this.getClass());
+    protected Event(Serializable data) {
+        super(data);
     }
 
-    public String getId() {
-        return this.id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getEntityId() {
-        return entityId;
-    }
-
-    public static String createEventType(Class<? extends Event> commandClass) {
-        return commandClass.getSimpleName();
+    protected Event(Command command) {
+        super(command.getData(), command.getEntityId());
     }
 }
