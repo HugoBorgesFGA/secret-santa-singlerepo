@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 public class EventEntity extends NonRepeatableEntity {
     private LocalDateTime createdAt;
     private String name;
-    private int version;
     private String eventId;
     private String entityId;
     private String data;

@@ -12,7 +12,18 @@ public class EventMapper {
 
     private final ObjectMapper objectMapper;
 
-    public EventEntity from(Event event) {
+    public Event toDomain(EventEntity entity) {
+        final Event event = new Event();
+        event.setCreatedAt(entity.getCreatedAt());
+        event.setName(entity.getName());
+        event.setId(entity.getEventId());
+        event.setEntityId(entity.getEntityId());
+        event.setData(entity.getData());
+
+        return event;
+    };
+
+    public EventEntity toEntity(Event event) {
         try {
             final EventEntity eventEntity = EventEntity.builder()
                 .createdAt(event.getCreatedAt())

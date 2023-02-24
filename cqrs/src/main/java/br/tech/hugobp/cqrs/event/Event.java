@@ -5,7 +5,7 @@ import br.tech.hugobp.cqrs.command.Command;
 
 import java.io.Serializable;
 
-public abstract class Event extends Message {
+public class Event extends Message {
     protected Event(Serializable data, String entityId) {
         super(data, entityId);
     }
@@ -16,5 +16,9 @@ public abstract class Event extends Message {
 
     protected Event(Command command) {
         super(command.getData(), command.getEntityId());
+    }
+
+    public Event() {
+        super();
     }
 }

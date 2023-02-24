@@ -4,14 +4,18 @@ import br.tech.hugobp.cqrs.postgres.PostgresDatabaseConfig;
 
 import java.sql.*;
 import java.time.ZoneOffset;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Function;
 
 public class EventRepository {
-    private static final Function<String, String> INSERT_COMMAND_INTO = (table) -> "INSERT INTO " + table + " " +
+    private static final Function<String, String> INSERT_EVENT_INTO = (table) -> "INSERT INTO " + table + " " +
             "(id, name, created_at, hash, id_entity, data) " +
             "VALUES(?, ?, ?, ?, ?, ?::jsonb)";
+    private static final Function<String, String> GET_EVENT_STREAM_PER_ENTITY_ID = (table) -> "SELECT e.id, e.name, e.created_at, e.hash, e.id_entity, e.data " +
+            "FROM " + table + " e " +
+            "WHERE e.id_entity = ? " +
+            "ORDER BY created_at ASC";
+
     private static final Short DEFAULT_POSTGRES_PORT = 5432;
 
     private final String schema;
@@ -26,7 +30,7 @@ public class EventRepository {
 
     public void save(EventEntity eventEntity) {
         try {
-            final String insertQuery = INSERT_COMMAND_INTO.apply(eventTable);
+            final String insertQuery = INSERT_EVENT_INTO.apply(eventTable);
             final PreparedStatement statement = connection.prepareStatement(insertQuery);
 
             statement.setString(1, eventEntity.getEventId());
@@ -37,6 +41,36 @@ public class EventRepository {
             statement.setString(6, eventEntity.getData());
 
             statement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<EventEntity> findAll(String entityId) {
+        try {
+            final List<EventEntity> result = new ArrayList<>();
+
+            final String getByEntityIdQuery = GET_EVENT_STREAM_PER_ENTITY_ID.apply(eventTable);
+            final PreparedStatement statement = connection.prepareStatement(getByEntityIdQuery);
+
+            statement.setString(1, entityId);
+
+            final ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                final EventEntity eventEntity = EventEntity.builder()
+                    .eventId(resultSet.getString(1))
+                    .name(resultSet.getString(2))
+                    .createdAt(resultSet.getTimestamp(3).toLocalDateTime())
+                    .entityId(resultSet.getString(5))
+                    .data(resultSet.getString(6))
+                    .build();
+
+                eventEntity.setNonRepeatableId(resultSet.getString(5));
+
+                result.add(eventEntity);
+            }
+
+            return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

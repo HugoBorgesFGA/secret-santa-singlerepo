@@ -4,6 +4,9 @@ import br.tech.hugobp.cqrs.event.Event;
 import br.tech.hugobp.cqrs.event.EventStore;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 public class PostgresEventStore implements EventStore {
 
@@ -12,7 +15,14 @@ public class PostgresEventStore implements EventStore {
 
     @Override
     public void store(Event event) {
-        final EventEntity eventEntity = eventMapper.from(event);
+        final EventEntity eventEntity = eventMapper.toEntity(event);
         eventRepository.save(eventEntity);
+    }
+
+    @Override
+    public List<Event> getEvents(String entityId) {
+        return eventRepository.findAll(entityId).stream()
+            .map(eventMapper::toDomain)
+            .collect(Collectors.toList());
     }
 }
